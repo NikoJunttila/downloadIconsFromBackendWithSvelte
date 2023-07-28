@@ -3,21 +3,38 @@
 	import Textbox from '$lib/Textbox.svelte';
 	import type { Icons } from '$lib/interfaces';
 	import { onMount } from 'svelte';
+	import Loader from '$lib/Loader.svelte';
 	let textboxNames: string[] = [];
 	let dropboxNames: string[] = [];
 	$: reqNames = textboxNames.concat(dropboxNames);
 	let icons: Icons[] = [];
 
 	async function fetchIcons() {
+		loading = true
 		try {
 			const response = await fetch(`http://localhost:8080/get/${selected}`);
 			icons = await response.json();
+			
 		} catch (error) {
 			console.error('Error fetching icons:', error);
 			return error;
 		}
+		loading = false
+	}
+	async function fetchIconSetsNames() {
+		loading = true
+		try {
+			const response = await fetch("http://localhost:8080/iconsets");
+			iconSets = await response.json();
+			
+		} catch (error) {
+			console.error('Error fetching icons:', error);
+			return error;
+		}
+		loading = false
 	}
 	async function doPost() {
+		loading = true
 		try {
 			const res = await fetch(`http://localhost:8080/post/centria`, {
 				method: 'POST',
@@ -38,8 +55,10 @@
 		} catch (error) {
 			console.error(error);
 		}
+		loading = false
 	}
 	async function downloadFromBackend() {
+		loading = true
 		try {
 			const res = await fetch(`http://localhost:8080/download`, {
 				method: 'POST',
@@ -63,8 +82,10 @@
 		} catch (error) {
 			console.error(error);
 		}
+		loading = false
 	}
 	async function searchIcons() {
+		loading = true
 		try {
 			const res = await fetch(`http://localhost:8080/search`, {
 				method: 'POST',
@@ -85,16 +106,19 @@
 		} catch (error) {
 			console.error(error);
 		}
+		loading = false
 	}
-	let iconSets: string[] = ['centria', 'centriaDark', 'oxygen','breeze',"breezeDark"];
+	let iconSets: string[] = ['centria', 'centriaDark', 'oxygen','breeze'];
 	let selected: string = 'centria';
-
 	let searchText : string = ""
+
+
 	onMount(()=> {
 		fetchIcons()
+		fetchIconSetsNames()
 	})
+	let loading : boolean = false
 </script>
-
 <section class="mx-5">
 	<div class="grid place-items-center">
 		<span>select theme: <select class="text-black" bind:value={selected} on:change={fetchIcons}>
@@ -135,6 +159,11 @@
 					<p>no icon names added yet...</p>
 				{/each}
 			</div>
+			{#if loading}
+			<div class="flex justify-center py-3">
+			<Loader />
+		</div>
+			{/if}
 			<div class="flex flex-wrap gap-2 icon-container">
 				{#each icons as icon}
 					<figure>

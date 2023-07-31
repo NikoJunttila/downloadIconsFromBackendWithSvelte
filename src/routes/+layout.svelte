@@ -5,9 +5,12 @@
 	import '@skeletonlabs/skeleton/styles/skeleton.css';
 	// Most of your app wide CSS should be put in this file
 	import '../app.postcss';
+	import { Toast } from '@skeletonlabs/skeleton';
+	import { autoModeWatcher } from '@skeletonlabs/skeleton';
+
 </script>
-<style>
-</style>
-<main class="max-w-[100vw] flex flex-col items-center py-10">
+<svelte:head>{@html `<script>${autoModeWatcher.toString()} autoModeWatcher();</script>`}</svelte:head>
+<main class="flex flex-col items-center py-10">
+<Toast position="t"/>
 <slot />
 </main>

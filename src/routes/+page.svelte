@@ -4,6 +4,16 @@
 	import type { Icons } from '$lib/interfaces';
 	import { onMount } from 'svelte';
 	import Loader from '$lib/Loader.svelte';
+	import { toastStore } from '@skeletonlabs/skeleton';
+	import type { ToastSettings } from '@skeletonlabs/skeleton';
+	import Snowrain from '$lib/Snowrain.svelte';
+
+	const error : ToastSettings = {
+	message: 'Error loading icons. Reload page and try again',
+	background: 'variant-filled-error',
+	classes: "text-lg"
+	};
+
 	let textboxNames: string[] = [];
 	let dropboxNames: string[] = [];
 	$: reqNames = textboxNames.concat(dropboxNames);
@@ -13,8 +23,12 @@
 		loading = true
 		try {
 			const response = await fetch(`http://localhost:8080/get/${selected}`);
-			icons = await response.json();
-			
+			const jason = await response.json();
+			if (jason){
+				icons = jason
+			} else {
+				toastStore.trigger(error);
+			}
 		} catch (error) {
 			console.error('Error fetching icons:', error);
 			return error;
@@ -51,6 +65,8 @@
 			console.log(newIcons);
 			if (newIcons != null){
 				icons = newIcons;
+			} else {
+				toastStore.trigger(error);
 			}
 		} catch (error) {
 			console.error(error);
@@ -102,6 +118,8 @@
 			console.log(newIcons);
 			if (newIcons != null){
 				icons = newIcons;
+			} else {
+				toastStore.trigger(error);
 			}
 		} catch (error) {
 			console.error(error);
@@ -118,7 +136,13 @@
 		fetchIconSetsNames()
 	})
 	let loading : boolean = false
+	import Konami from '$lib/Konami.svelte';
+	let konami : boolean = false
 </script>
+<Konami bind:konami />
+{#if konami}
+<Snowrain />
+{/if}
 <section class="mx-5">
 	<div class="grid place-items-center">
 		<span>select theme: <select class="text-black" bind:value={selected} on:change={fetchIcons}>
@@ -328,15 +352,13 @@
   background: url(https://upload.wikimedia.org/wikipedia/commons/9/9d/Caret_down_font_awesome_whitevariation.svg)
       no-repeat right 0.8em center / 1.4em,
     linear-gradient(to left, rgba(255, 255, 255, 0.3) 3em, rgba(255, 255, 255, 0.2) 3em);
-  color: white;
   border-radius: 0.25em;
   box-shadow: 0 0 1em 0 rgba(0, 0, 0, 0.2);
   cursor: pointer;
   margin-bottom: 5px;
   }
   option {
-    color: inherit;
-    background-color: #34034c;
+    background-color: #49011d;
   }
   &::-ms-expand {
     display: none;

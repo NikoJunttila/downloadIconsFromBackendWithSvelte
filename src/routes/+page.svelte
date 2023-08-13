@@ -23,7 +23,7 @@
 	async function fetchIcons() {
 		loading = true;
 		try {
-			const response = await fetch(`http://${server}/get/${selected}`);
+			const response = await fetch(`https://${server}/get/${selected}`);
 			const jason = await response.json();
 			if (jason) {
 				icons = jason;
@@ -39,7 +39,7 @@
 	async function fetchIconSetsNames() {
 		loading = true;
 		try {
-			const response = await fetch(`http://${server}/iconsets`);
+			const response = await fetch(`https://${server}/iconsets`);
 			iconSets = await response.json();
 		} catch (error) {
 			console.error('Error fetching icons:', error);
@@ -50,7 +50,7 @@
 	async function doPost() {
 		loading = true;
 		try {
-			const res = await fetch(`http://${server}/post/centria`, {
+			const res = await fetch(`https://${server}/post/centria`, {
 				method: 'POST',
 				body: JSON.stringify({
 					theme: selected,
@@ -76,7 +76,7 @@
 	async function downloadFromBackend() {
 		loading = true;
 		try {
-			const res = await fetch(`http://${server}/download`, {
+			const res = await fetch(`https://${server}/download`, {
 				method: 'POST',
 				body: JSON.stringify({
 					theme: selected,
@@ -103,7 +103,7 @@
 	async function searchIcons() {
 		loading = true;
 		try {
-			const res = await fetch(`http://${server}/search`, {
+			const res = await fetch(`https://${server}/search`, {
 				method: 'POST',
 				body: JSON.stringify({
 					theme: selected,

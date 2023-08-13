@@ -8,24 +8,25 @@
 	import type { ToastSettings } from '@skeletonlabs/skeleton';
 	import Snowrain from '$lib/Snowrain.svelte';
 
-	const error : ToastSettings = {
-	message: 'Error loading icons. Reload page and try again',
-	background: 'variant-filled-error',
-	classes: "text-lg"
+	const error: ToastSettings = {
+		message: 'Error loading icons. Reload page and try again',
+		background: 'variant-filled-error',
+		classes: 'text-lg'
 	};
 
 	let textboxNames: string[] = [];
 	let dropboxNames: string[] = [];
 	$: reqNames = textboxNames.concat(dropboxNames);
 	let icons: Icons[] = [];
-
+	//localhost:8080
+	let server: string = 'lactuca.serveo.net';
 	async function fetchIcons() {
-		loading = true
+		loading = true;
 		try {
-			const response = await fetch(`http://localhost:8080/get/${selected}`);
+			const response = await fetch(`http://${server}/get/${selected}`);
 			const jason = await response.json();
-			if (jason){
-				icons = jason
+			if (jason) {
+				icons = jason;
 			} else {
 				toastStore.trigger(error);
 			}
@@ -33,24 +34,23 @@
 			console.error('Error fetching icons:', error);
 			return error;
 		}
-		loading = false
+		loading = false;
 	}
 	async function fetchIconSetsNames() {
-		loading = true
+		loading = true;
 		try {
-			const response = await fetch("http://localhost:8080/iconsets");
+			const response = await fetch(`http://${server}/iconsets`);
 			iconSets = await response.json();
-			
 		} catch (error) {
 			console.error('Error fetching icons:', error);
 			return error;
 		}
-		loading = false
+		loading = false;
 	}
 	async function doPost() {
-		loading = true
+		loading = true;
 		try {
-			const res = await fetch(`http://localhost:8080/post/centria`, {
+			const res = await fetch(`http://${server}/post/centria`, {
 				method: 'POST',
 				body: JSON.stringify({
 					theme: selected,
@@ -63,7 +63,7 @@
 
 			let newIcons = await res.json();
 			console.log(newIcons);
-			if (newIcons != null){
+			if (newIcons != null) {
 				icons = newIcons;
 			} else {
 				toastStore.trigger(error);
@@ -71,12 +71,12 @@
 		} catch (error) {
 			console.error(error);
 		}
-		loading = false
+		loading = false;
 	}
 	async function downloadFromBackend() {
-		loading = true
+		loading = true;
 		try {
-			const res = await fetch(`http://localhost:8080/download`, {
+			const res = await fetch(`http://${server}/download`, {
 				method: 'POST',
 				body: JSON.stringify({
 					theme: selected,
@@ -88,22 +88,22 @@
 			});
 			let blob = await res.blob();
 			const url = window.URL.createObjectURL(blob);
-			const a = document.createElement("a");
-			a.style.display = "none";
+			const a = document.createElement('a');
+			a.style.display = 'none';
 			a.href = url;
-			a.download = "icons.zip";
+			a.download = 'icons.zip';
 			document.body.appendChild(a);
-            a.click();
-            window.URL.revokeObjectURL(url);
+			a.click();
+			window.URL.revokeObjectURL(url);
 		} catch (error) {
 			console.error(error);
 		}
-		loading = false
+		loading = false;
 	}
 	async function searchIcons() {
-		loading = true
+		loading = true;
 		try {
-			const res = await fetch(`http://localhost:8080/search`, {
+			const res = await fetch(`http://${server}/search`, {
 				method: 'POST',
 				body: JSON.stringify({
 					theme: selected,
@@ -116,7 +116,7 @@
 
 			let newIcons = await res.json();
 			console.log(newIcons);
-			if (newIcons != null){
+			if (newIcons != null) {
 				icons = newIcons;
 			} else {
 				toastStore.trigger(error);
@@ -124,56 +124,67 @@
 		} catch (error) {
 			console.error(error);
 		}
-		loading = false
+		loading = false;
 	}
-	let iconSets: string[] = ['centria', 'centriaDark', 'oxygen','breeze'];
+	let iconSets: string[] = ['centria', 'centriaDark', 'oxygen', 'breeze'];
 	let selected: string = 'centria';
-	let searchText : string = ""
+	let searchText: string = '';
 
-
-	onMount(()=> {
-		fetchIcons()
-		fetchIconSetsNames()
-	})
-	let loading : boolean = false
+	onMount(() => {
+		fetchIcons();
+		fetchIconSetsNames();
+	});
+	let loading: boolean = false;
 	import Konami from '$lib/Konami.svelte';
-	let konami : boolean = false
+	let konami: boolean = false;
 </script>
+
 <Konami bind:konami />
 {#if konami}
-<Snowrain />
+	<Snowrain />
 {/if}
 <section class="mx-5">
+
 	<div class="grid place-items-center">
-		<span>select theme: <select class="text-black" bind:value={selected} on:change={fetchIcons}>
-			{#each iconSets as set}
-				<option value={set}>
-					{set}
-				</option>
-			{/each}
-		</select>
-	</span>
-	<div class="flex">
-		<button on:click={doPost}>
-			<span />
-			<span />
-			<span />
-			<span /> get icons
-		</button>
-		<button on:click={downloadFromBackend}
-			><span />
-			<span />
-			<span />
-			<span /> Download
-		</button>
-	</div>
+		{#if konami}
+		be server loc: <input type="text" bind:value={server} /> <button on:click={() => konami = false}>hide</button> 
+		{/if}
+		<span
+			>select theme: <select class="text-black" bind:value={selected} on:change={fetchIcons}>
+				{#each iconSets as set}
+					<option value={set}>
+						{set}
+					</option>
+				{/each}
+			</select>
+		</span>
+		<div class="flex">
+			<button on:click={doPost}>
+				<span />
+				<span />
+				<span />
+				<span /> get icons
+			</button>
+			<button on:click={downloadFromBackend}
+				><span />
+				<span />
+				<span />
+				<span /> Download
+			</button>
+		</div>
 		<div class="flex gap-2 my-3">
-		<input class="pl-3 rounded drop-shadow-md text-black bg-slate-200" type="text" bind:value={searchText} />
-		<button on:click={searchIcons}><span />
-			<span />
-			<span />
-			<span />search</button>
-	</div>
+			<input
+				class="pl-3 rounded drop-shadow-md text-black bg-slate-200"
+				type="text"
+				bind:value={searchText}
+			/>
+			<button on:click={searchIcons}
+				><span />
+				<span />
+				<span />
+				<span />search</button
+			>
+		</div>
 		<div>
 			<div class="text-center">
 				<span class="text-lg font-bold">Looking for: </span>
@@ -184,14 +195,14 @@
 				{/each}
 			</div>
 			{#if loading}
-			<div class="flex justify-center py-3">
-			<Loader />
-		</div>
+				<div class="flex justify-center py-3">
+					<Loader />
+				</div>
 			{/if}
 			<div class="flex flex-wrap gap-2 icon-container">
 				{#each icons as icon}
 					<figure>
-						<img class="rotate-center" src={icon.url} alt={icon.name} title={icon.name} />
+						<img class="rotate-center icon" src={icon.url} alt={icon.name} title={icon.name} />
 						<p class="ml-1">{icon.size}</p>
 					</figure>
 				{:else}
@@ -210,9 +221,16 @@
 		</div>
 	</div>
 </section>
+<div class="absolute top-0 left-0 flex items-center">
+	<img
+		alt="konami"
+		width="170"
+		src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e2/Konami_Code.svg/600px-Konami_Code.svg.png"
+	/><sub class="-translate-y-1">+ enter</sub>
+</div>
 
 <style>
-	img {
+	.icon {
 		width: 50px;
 		height: 50px;
 		margin: 2px;
@@ -340,27 +358,24 @@
 		transition-delay: none;
 	}
 	select {
-  appearance: none;
-  border: 0;
-  outline: 0;
-  font: inherit;
-  width: 15em;
-  height: 3em;
-  padding: 0 4em 0 1em;
-  text-align: center;
-  text-transform: uppercase;
-  background: url(https://upload.wikimedia.org/wikipedia/commons/9/9d/Caret_down_font_awesome_whitevariation.svg)
-      no-repeat right 0.8em center / 1.4em,
-    linear-gradient(to left, rgba(255, 255, 255, 0.3) 3em, rgba(255, 255, 255, 0.2) 3em);
-  border-radius: 0.25em;
-  box-shadow: 0 0 1em 0 rgba(0, 0, 0, 0.2);
-  cursor: pointer;
-  margin-bottom: 5px;
-  }
-  option {
-    background-color: #49011d;
-  }
-  &::-ms-expand {
-    display: none;
-  }
+		appearance: none;
+		border: 0;
+		outline: 0;
+		font: inherit;
+		width: 15em;
+		height: 3em;
+		padding: 0 4em 0 1em;
+		text-align: center;
+		text-transform: uppercase;
+		background: url(https://upload.wikimedia.org/wikipedia/commons/9/9d/Caret_down_font_awesome_whitevariation.svg)
+				no-repeat right 0.8em center / 1.4em,
+			linear-gradient(to left, rgba(255, 255, 255, 0.3) 3em, rgba(255, 255, 255, 0.2) 3em);
+		border-radius: 0.25em;
+		box-shadow: 0 0 1em 0 rgba(0, 0, 0, 0.2);
+		cursor: pointer;
+		margin-bottom: 5px;
+	}
+	&::-ms-expand {
+		display: none;
+	}
 </style>

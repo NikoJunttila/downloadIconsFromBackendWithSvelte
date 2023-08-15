@@ -15,7 +15,6 @@
   
       combo.push(event.key);
       time = now;
-      console.log(combo);
       if (JSON.stringify(combo) === JSON.stringify(list)) {
         konami = !konami;
       }

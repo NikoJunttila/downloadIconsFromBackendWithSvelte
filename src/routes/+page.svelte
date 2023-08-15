@@ -19,11 +19,11 @@
 	$: reqNames = textboxNames.concat(dropboxNames);
 	let icons: Icons[] = [];
 	//localhost:8080
-	let server: string = 'lactuca.serveo.net';
+	let server: string = 'http://localhost:8080';
 	async function fetchIcons() {
 		loading = true;
 		try {
-			const response = await fetch(`https://${server}/get/${selected}`);
+			const response = await fetch(`${server}/get/${selected}`);
 			const jason = await response.json();
 			if (jason) {
 				icons = jason;
@@ -39,7 +39,7 @@
 	async function fetchIconSetsNames() {
 		loading = true;
 		try {
-			const response = await fetch(`https://${server}/iconsets`);
+			const response = await fetch(`${server}/iconsets`);
 			iconSets = await response.json();
 		} catch (error) {
 			console.error('Error fetching icons:', error);
@@ -50,7 +50,7 @@
 	async function doPost() {
 		loading = true;
 		try {
-			const res = await fetch(`https://${server}/post/centria`, {
+			const res = await fetch(`${server}/post/centria`, {
 				method: 'POST',
 				body: JSON.stringify({
 					theme: selected,
@@ -76,7 +76,7 @@
 	async function downloadFromBackend() {
 		loading = true;
 		try {
-			const res = await fetch(`https://${server}/download`, {
+			const res = await fetch(`${server}/download`, {
 				method: 'POST',
 				body: JSON.stringify({
 					theme: selected,
@@ -103,7 +103,7 @@
 	async function searchIcons() {
 		loading = true;
 		try {
-			const res = await fetch(`https://${server}/search`, {
+			const res = await fetch(`${server}/search`, {
 				method: 'POST',
 				body: JSON.stringify({
 					theme: selected,

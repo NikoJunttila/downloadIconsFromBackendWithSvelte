@@ -148,6 +148,7 @@
 	<div class="grid place-items-center">
 		{#if konami}
 		be server loc: <input type="text" bind:value={server} /> <button on:click={() => konami = false}>hide</button> 
+		<button on:click={() => fetchIconSetsNames()}>fetch themes</button>
 		{/if}
 		<span
 			>select theme: <select class="text-black" bind:value={selected} on:change={fetchIcons}>
